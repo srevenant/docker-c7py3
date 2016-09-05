@@ -1,0 +1,23 @@
+#!/bin/bash
+
+ps=$(docker ps -a -f name=${DOCKER_NAME} --format="{{.ID}}")
+if [ -n "$ps" ]; then
+	echo "Cleaning up old containers for ${DOCKER_NAME}"
+	for img in $ps; do
+		docker rm $img
+	done
+fi
+
+echo "Starting ${DOCKER_NAME}"
+detach=true
+
+cmd() {
+	printf "Execute:\n\n\t"
+	echo "$@"
+	printf "\n"
+	"$@"
+}
+
+cmd docker run --detach=$detach --restart=always \
+		--name=${DOCKER_NAME} \
+		-P ${DOCKER_NAME}
